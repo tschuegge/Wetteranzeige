@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Wetteranzeige</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <!-- JavaScript wird i.d.R. am Schluss des Body geladen, um das Rendering des HTML nicht zu blockieren -->
+</head>
+
+<body>
+  <div class="container p-5">
+
+    <!-- Eingabe des Orts -->
+    <div id="ort-container">
+      <div class="input-group">
+        <input type="text" name="ort" id="textfield-ort" placeholder="Ort" value="Buchs" class="form-control">
+        <div class="input-group-append">
+          <button id="button-laden" type="button" class="btn btn-primary">Laden</button>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Anzeige wärend dessen die Daten geladen werden -->
+    <div id="laden-container" class="text-center">
+      <span class="text-muted">Bitte warten...</span>
+    </div>
+
+    <!-- Anzeige wenn während des Ladens ein Fehler aufgetreten ist -->
+    <div id="fehler-container" class="text-center d-none">
+      <div class="alert alert-danger">Beim Laden ist ein Fehler aufgetreten!</div>
+    </div>
+
+    <!-- Anzeige wenn Wetter geladen wurde -->
+    <div id="wetter-container" class="text-center d-none">
+      <h5 id="label-titel"></h5>
+      <p>
+        <img id="img-wetter-bedingung" src="" alt="" style="width: 64px;"><br>
+        <span id="label-wetter-bedingung"></span>
+      </p>
+      <p><span id="label-temperatur"></span>°C</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>
+
+      /**
+       * Sobald HTML und JavaScript geladen sind, kann die Funktion aufgerufen werden, welche das Wetter lädt und das Klick-Event auf dem Button ausgewertet werden
+       */
+      $(document).ready(function () {
+
+        // Wetter laden, damit etwas auf der Seite angezeigt wird (vorbelegter Wert im Textfeld ist 'Buchs')
+        wetterAktualisieren();
+
+        // Beim Klick auf die Schaltfläche 'Laden' muss das Wetter ebenfalls aktualisiert werden
+        $("#button-laden").click(function () {
+          wetterAktualisieren();
+        });
+
+      });
+
+      /**
+       * Aktualisiert die Ansicht mit dem Ort im Textfeld
+       */
+      function wetterAktualisieren() {
+
+        // Ladeanzeige darstellen
+        $("#laden-container").removeClass("d-none");
+        $("#wetter-container, #fehler-container").addClass("d-none");
+
+        // Ort aus Textfeld laden
+        var ort = $("#textfield-ort").val();
+
+        // REST API aufrufen...
+        $.getJSON("https://api.apixu.com/v1/current.json?key=3f17bee801b54469a8f133144191901&lang=de&q=" + ort)
+
+          // ... wenn der Aufruf erfolgreich war folgendes ausführen:
+          .done(function (response) {
+
+            // Titel setzen
+            if (response.location && response.location.name) { // Prüfen ob Werte vorhanden sind
+              $("#label-titel").text("Aktuelles Wetter für " + response.location.name);
+            }
+
+            // Bedingungen (Icon und Text) setzen
+            if (response.current && response.current.condition && response.current.condition.text && response.current.condition.icon) { // Prüfen ob Werte vorhanden sind
+
+              // Icon-URL anpassen
+              var iconUrl = response.current.condition.icon; // z.B. //cdn.apixu.com/weather/64x64/night/326.png
+              iconUrl = iconUrl.replace("64x64", "128x128"); // Höher aufgelöste Version des Icons laden: //cdn.apixu.com/weather/128x128/night/326.png
+              iconUrl = "https:" + iconUrl; // Als Protokoll fix 'https' verwenden: https://cdn.apixu.com/weather/128x128/night/326.png
+
+              // Icon-URL und Alternativtext setzen
+              $("#img-wetter-bedingung").attr("src", iconUrl);
+              $("#img-wetter-bedingung").attr("alt", response.current.condition.text);
+
+              // Bedingung als Text setzen
+              $("#label-wetter-bedingung").text(response.current.condition.text);
+            }
+
+            // Temperatur setzen
+            if (response.current.temp_c) { // Prüfen ob Werte vorhanden sind, response.current muss nicht mehr geprüft werden, es wurde vorher bereits geprüft
+              $("#label-temperatur").text(response.current.temp_c);
+            }
+
+            // Ladeanzeige ausblenden und Ergebnis darstellen
+            $("#laden-container").addClass("d-none");
+            $("#wetter-container").removeClass("d-none");
+
+          })
+
+          // .. wenn der Aufruf nicht erfolgreich war folgendes ausführen:
+          .fail(function () {
+
+            // Ladeanzeige ausblenden und Fehler darstellen
+            $("#laden-container").addClass("d-none");
+            $("#fehler-container").removeClass("d-none");
+          });
+      }
+    </script>
+
+</body>
+
+</html>

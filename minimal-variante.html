@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Wetteranzeige Minimal-Variante</title>
+  <!-- JavaScript wird i.d.R. am Schluss des Body geladen, um das Rendering des HTML nicht zu blockieren -->
+</head>
+
+<body>
+  <h1>Aktuelles Wetter in Buchs</h1>
+  <p id="wetter"></p>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script>
+
+    /**
+     * Sobald HTML und JavaScript geladen sind, wird das Wetter asynchron nachgeladen
+     */
+    $(document).ready(function () {
+
+      $.getJSON("https://api.apixu.com/v1/current.json?key=3f17bee801b54469a8f133144191901&lang=de&q=Buchs", function (response) {
+
+        // Text im Element mit der ID 'wetter' ersetzen
+        $("#wetter").text(response.current.condition.text + " bei " + response.current.temp_c + "°C");
+
+      });
+
+    });
+
+  </script>
+</body>
+
+</html>
