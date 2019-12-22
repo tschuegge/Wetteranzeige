@@ -76,7 +76,7 @@
         var ort = $("#textfield-ort").val();
 
         // REST API aufrufen...
-        $.getJSON("https://api.apixu.com/v1/current.json?key=3f17bee801b54469a8f133144191901&lang=de&q=" + ort)
+        $.getJSON("http://api.weatherstack.com/current?access_key=7063f90987c7df61318bc66e974d74ea&query=" + ort)
 
           // ... wenn der Aufruf erfolgreich war folgendes ausführen:
           .done(function (response) {
@@ -87,24 +87,19 @@
             }
 
             // Bedingungen (Icon und Text) setzen
-            if (response.current && response.current.condition && response.current.condition.text && response.current.condition.icon) { // Prüfen ob Werte vorhanden sind
-
-              // Icon-URL anpassen
-              var iconUrl = response.current.condition.icon; // z.B. //cdn.apixu.com/weather/64x64/night/326.png
-              iconUrl = iconUrl.replace("64x64", "128x128"); // Höher aufgelöste Version des Icons laden: //cdn.apixu.com/weather/128x128/night/326.png
-              iconUrl = "https:" + iconUrl; // Als Protokoll fix 'https' verwenden: https://cdn.apixu.com/weather/128x128/night/326.png
+            if (response.current && response.current.weather_descriptions[0] && response.current.weather_icons[0]) { // Prüfen ob Werte vorhanden sind
 
               // Icon-URL und Alternativtext setzen
-              $("#img-wetter-bedingung").attr("src", iconUrl);
-              $("#img-wetter-bedingung").attr("alt", response.current.condition.text);
+              $("#img-wetter-bedingung").attr("src", response.current.weather_icons[0]);
+              $("#img-wetter-bedingung").attr("alt", response.current.weather_descriptions[0]);
 
               // Bedingung als Text setzen
-              $("#label-wetter-bedingung").text(response.current.condition.text);
+              $("#label-wetter-bedingung").text(response.current.weather_descriptions[0]);
             }
 
             // Temperatur setzen
-            if (response.current.temp_c) { // Prüfen ob Werte vorhanden sind, response.current muss nicht mehr geprüft werden, es wurde vorher bereits geprüft
-              $("#label-temperatur").text(response.current.temp_c);
+            if (response.current.temperature) { // Prüfen ob Werte vorhanden sind, response.current muss nicht mehr geprüft werden, es wurde vorher bereits geprüft
+              $("#label-temperatur").text(response.current.temperature);
             }
 
             // Ladeanzeige ausblenden und Ergebnis darstellen
