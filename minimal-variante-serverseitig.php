@@ -1,5 +1,5 @@
 <?php
-$wetterdatenJson = file_get_contents("http://api.weatherstack.com/current?access_key=7063f90987c7df61318bc66e974d74ea&query=Buchs");
+$wetterdatenJson = file_get_contents("https://api.openweathermap.org/data/2.5/weather?appid=3d37b0aa0b8e383968a3a8243d954202&lang=de&units=metric&q=Buchs");
 $wetterdaten = json_decode($wetterdatenJson);
 ?>
 <!DOCTYPE html>
@@ -12,6 +12,6 @@ $wetterdaten = json_decode($wetterdatenJson);
 </head>
 <body>
   <h1>Aktuelles Wetter in Buchs</h1>
-  <p><?php echo $wetterdaten->current->weather_descriptions[0] ?> bei <?php echo $wetterdaten->current->temperature ?>°C</p>
+  <p><?php echo $wetterdaten->weather[0]->description ?> bei <?php echo $wetterdaten->main->temp ?>°C</p>
 </body>
 </html>

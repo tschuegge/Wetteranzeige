@@ -76,30 +76,30 @@
         var ort = $("#textfield-ort").val();
 
         // REST API aufrufen...
-        $.getJSON("http://api.weatherstack.com/current?access_key=7063f90987c7df61318bc66e974d74ea&query=" + ort)
+        $.getJSON("https://api.openweathermap.org/data/2.5/weather?appid=3d37b0aa0b8e383968a3a8243d954202&lang=de&units=metric&q=" + ort)
 
           // ... wenn der Aufruf erfolgreich war folgendes ausführen:
           .done(function (response) {
 
             // Titel setzen
-            if (response.location && response.location.name) { // Prüfen ob Werte vorhanden sind
-              $("#label-titel").text("Aktuelles Wetter für " + response.location.name);
+            if (response.name) { // Prüfen ob Wert vorhanden sind
+              $("#label-titel").text("Aktuelles Wetter für " + response.name);
             }
 
             // Bedingungen (Icon und Text) setzen
-            if (response.current && response.current.weather_descriptions[0] && response.current.weather_icons[0]) { // Prüfen ob Werte vorhanden sind
+            if (response.weather && response.weather.length > 0 && response.weather[0].description && response.weather[0].icon) { // Prüfen ob Werte vorhanden sind
 
               // Icon-URL und Alternativtext setzen
-              $("#img-wetter-bedingung").attr("src", response.current.weather_icons[0]);
-              $("#img-wetter-bedingung").attr("alt", response.current.weather_descriptions[0]);
+              $("#img-wetter-bedingung").attr("src", "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png");
+              $("#img-wetter-bedingung").attr("alt", response.weather[0].description);
 
               // Bedingung als Text setzen
-              $("#label-wetter-bedingung").text(response.current.weather_descriptions[0]);
+              $("#label-wetter-bedingung").text(response.weather[0].description);
             }
 
             // Temperatur setzen
-            if (response.current.temperature) { // Prüfen ob Werte vorhanden sind, response.current muss nicht mehr geprüft werden, es wurde vorher bereits geprüft
-              $("#label-temperatur").text(response.current.temperature);
+            if (response.main.temp) { // Prüfen ob Werte vorhanden sind, response.current muss nicht mehr geprüft werden, es wurde vorher bereits geprüft
+              $("#label-temperatur").text(response.main.temp);
             }
 
             // Ladeanzeige ausblenden und Ergebnis darstellen

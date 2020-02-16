@@ -21,10 +21,10 @@
      */
     $(document).ready(function () {
 
-      $.getJSON("http://api.weatherstack.com/current?access_key=7063f90987c7df61318bc66e974d74ea&query=Buchs", function (response) {
+      $.getJSON("https://api.openweathermap.org/data/2.5/weather?appid=3d37b0aa0b8e383968a3a8243d954202&lang=de&units=metric&q=Buchs", function (response) {
 
         // Text im Element mit der ID 'wetter' ersetzen
-        $("#wetter").text(response.current.weather_descriptions[0] + " at " + response.current.temperature + "°C");
+        $("#wetter").text(response.weather[0].description + " bei " + response.main.temp + "°C");
 
       });
 
